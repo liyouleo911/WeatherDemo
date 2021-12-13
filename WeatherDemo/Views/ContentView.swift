@@ -12,12 +12,22 @@ struct ContentView: View {
     @StateObject var locationManager = LocationManager()
     var weatherManager = WeatherManager()
     @State var weather: ResponseBody?
+    @State var lastWeather: ResponseBody?
     @Environment(\.scenePhase) var scenePhase
     var body: some View {
         VStack {
             if let location = locationManager.location {
                 if let weather = weather {
                     WeatherView(weather: weather)
+                } else if let lastWeather = lastWeather {
+                    WeatherView(weather: lastWeather)
+                        .task {
+                            do {
+                                weather = try await weatherManager.getCurrentWeather(latitude: location.latitude, longitude: location.longitude)
+                            } catch {
+                                print("Error getting weather: \(error)")
+                            }
+                        }
                 } else {
                     ProgressView()
                         .task {
@@ -45,8 +55,8 @@ struct ContentView: View {
                 return
             }
             if scenePhase == .background, newPhase == .inactive {
+                lastWeather = weather
                 weather = nil
-                locationManager.location = nil
                 locationManager.requestLocation()
             }
         }
