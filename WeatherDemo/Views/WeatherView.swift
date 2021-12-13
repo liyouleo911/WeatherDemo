@@ -28,8 +28,10 @@ struct WeatherView: View {
                 VStack {
                     HStack {
                         VStack(spacing: 20) {
-                            Image(systemName: "cloud")
-                                .font(.system(size: 40))
+                            KFImage(URL(string: "https://openweathermap.org/img/wn/\(weather.weather[0].icon)@2x.png"))
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 50)
                             
                             Text("\(weather.weather[0].main)")
                         }
