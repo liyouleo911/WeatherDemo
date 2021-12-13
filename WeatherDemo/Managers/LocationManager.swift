@@ -34,9 +34,12 @@ extension LocationManager: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         debugPrint(#function)
+        debugPrint("authorization status changed to \(status.rawValue)")
         if status != .notDetermined {
             isLoading = true
             manager.requestLocation()
+        } else {
+            location = nil
         }
     }
     
