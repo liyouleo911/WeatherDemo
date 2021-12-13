@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct WeatherView: View {
     
@@ -45,14 +46,13 @@ struct WeatherView: View {
                     Spacer()
                         .frame(height:  80)
                     
-                    AsyncImage(url: URL(string: "https://cdn.pixabay.com/photo/2020/01/24/21/33/city-4791269_960_720.png")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 350)
-                    } placeholder: {
-                        ProgressView()
-                    }
+                    KFImage(URL(string: "https://cdn.pixabay.com/photo/2020/01/24/21/33/city-4791269_960_720.png"))
+                        .placeholder({
+                            ProgressView()
+                        })
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 350)
                     
                     Spacer()
                 }
