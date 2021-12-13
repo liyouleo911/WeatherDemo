@@ -18,7 +18,7 @@ struct WeatherView: View {
                     Text(weather.name)
                         .bold().font(.title)
                     
-                    Text("Today, \(Date().formatted(.dateTime.month().day().hour().minute()))")
+                    Text("\(Date(timeIntervalSince1970: weather.dt).formatted(.dateTime.month().day().hour().minute()))")
                         .fontWeight(.light)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
