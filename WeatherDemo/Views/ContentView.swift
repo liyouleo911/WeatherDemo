@@ -12,6 +12,7 @@ struct ContentView: View {
     @StateObject var locationManager = LocationManager()
     var weatherManager = WeatherManager()
     @State var weather: ResponseBody?
+    @Environment(\.scenePhase) var scenePhase
     var body: some View {
         VStack {
             if let location = locationManager.location {
@@ -39,6 +40,16 @@ struct ContentView: View {
         }
         .background(Color(hue: 0.656, saturation: 0.787, brightness: 0.354))
         .preferredColorScheme(.dark)
+        .onChange(of: scenePhase) { newPhase in
+            guard let _ = locationManager.location else {
+                return
+            }
+            if scenePhase == .background, newPhase == .inactive {
+                weather = nil
+                locationManager.location = nil
+                locationManager.requestLocation()
+            }
+        }
     }
 }
 
