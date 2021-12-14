@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreLocation
+import UIKit
 
 class LocationManager: NSObject, ObservableObject {
     
@@ -18,11 +19,23 @@ class LocationManager: NSObject, ObservableObject {
     
     @Published var location: CLLocationCoordinate2D?
     @Published var isLoading = false
+    
+    var isLocationServiceDenied: Bool {
+        locationManager.authorizationStatus == .denied ||
+        locationManager.authorizationStatus == .restricted
+    }
+     
+    var isLocationServiceAvailable: Bool {
+        locationManager.authorizationStatus == .authorizedWhenInUse ||
+        locationManager.authorizationStatus == .authorizedAlways
+    }
 
     func requestLocation() {
         DispatchQueue.main.asyncAfter(deadline: .now()) { [self] in
             locationManager.delegate = self
-            if locationManager.authorizationStatus != .notDetermined {
+            if locationManager.authorizationStatus == .notDetermined {
+                locationManager.requestWhenInUseAuthorization()
+            } else {
                 isLoading = true
                 locationManager.requestLocation()
             }

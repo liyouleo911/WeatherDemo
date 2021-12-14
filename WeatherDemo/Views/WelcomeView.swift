@@ -24,12 +24,19 @@ struct WelcomeView: View {
             .multilineTextAlignment(.center)
             .padding()
 
-            LocationButton(.shareCurrentLocation) {
-                            locationManager.requestLocation()
+            Button("Share current location") {
+                if !locationManager.isLocationServiceDenied {
+                    locationManager.requestLocation()
+                } else {
+                    if let url = URL(string: UIApplication.openSettingsURLString), UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
                     }
-                    .cornerRadius(30)
-                    .symbolVariant(.fill)
-                    .foregroundColor(.white)
+                }
+            }
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(30)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

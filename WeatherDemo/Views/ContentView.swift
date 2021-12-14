@@ -55,16 +55,18 @@ struct ContentView: View {
                 } else {
                     WelcomeView()
                         .environmentObject(locationManager)
+                        .onAppear {
+                            if locationManager.isLocationServiceAvailable {
+                                locationManager.requestLocation()
+                            }
+                        }
                 }
             }
         }
         .background(Color(hue: 0.656, saturation: 0.787, brightness: 0.354))
         .preferredColorScheme(.dark)
         .onChange(of: scenePhase) { newPhase in
-            guard let _ = locationManager.location else {
-                return
-            }
-            if scenePhase == .background, newPhase == .inactive {
+            if scenePhase == .background, newPhase == .inactive, !locationManager.isLoading {
                 locationManager.requestLocation()
             }
         }
