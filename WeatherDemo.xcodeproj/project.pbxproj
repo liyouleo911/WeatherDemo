@@ -26,6 +26,8 @@
 		B3D9C3FD276326A3005224B7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B3D9C3FC276326A3005224B7 /* Preview Assets.xcassets */; };
 		B3D9C405276327CC005224B7 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D9C404276327CC005224B7 /* LocationManager.swift */; };
 		B3D9C4082763285E005224B7 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D9C4072763285E005224B7 /* WelcomeView.swift */; };
+		B3EE858327E2C1D10095D7D6 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37393AE27632DE3007DF96D /* WeatherManager.swift */; };
+		B3EE858427E2C32C0095D7D6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37393B427633065007DF96D /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -294,8 +296,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3EE858327E2C1D10095D7D6 /* WeatherManager.swift in Sources */,
 				B3C7B16A27E1885D00DDEFB0 /* WeatherDemo_Widget.swift in Sources */,
 				B3C7B17627E1889A00DDEFB0 /* WeatherDemo_WidgetHelper.swift in Sources */,
+				B3EE858427E2C32C0095D7D6 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

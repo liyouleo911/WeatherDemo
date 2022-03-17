@@ -12,12 +12,13 @@ import CoreLocation
 struct Provider: TimelineProvider {
     
     var widgetLocationManager = WidgetLocationManager()
+    var weatherManager = WeatherManager()
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), latitude: "", longitude: "")
+        SimpleEntry(date: Date(), location: "", temp: "")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), latitude: "", longitude: "")
+        let entry = SimpleEntry(date: Date(), location: "", temp: "")
         completion(entry)
     }
 
@@ -26,26 +27,41 @@ struct Provider: TimelineProvider {
             widgetLocationManager.locationManager = CLLocationManager()
         }
         widgetLocationManager.fetchLocation(handler: { clLocation in
-            print(clLocation)
-            var entries: [SimpleEntry] = []
-            
-            // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-            let currentDate = Date()
-            for hourOffset in 0 ..< 5 {
-                let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-                let entry = SimpleEntry(date: entryDate, latitude: String(format: "%.2lf", clLocation.coordinate.latitude), longitude: String(format: "%.2lf", clLocation.coordinate.longitude))
-                entries.append(entry)
+            guard let clLocation = clLocation else {
+                let currentDate = Date()
+                let timeline = Timeline(entries: [SimpleEntry(date: currentDate, location: "", temp: "")], policy: .after(currentDate.addingTimeInterval(5 * 60)))
+                completion(timeline)
+                return
             }
-            let timeline = Timeline(entries: entries, policy: .atEnd)
-            completion(timeline)
+            Task {
+                do {
+                    let weather = try await weatherManager.getCurrentWeather(latitude: clLocation.coordinate.latitude, longitude: clLocation.coordinate.longitude)
+                    var entries: [SimpleEntry] = []
+                    
+                    // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+                    let currentDate = Date()
+                    for hourOffset in 0 ..< 5 {
+                        let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+                        let entry = SimpleEntry(date: entryDate, location: weather.name, temp: weather.main.feelsLike.roundDouble())
+                        entries.append(entry)
+                    }
+                    let timeline = Timeline(entries: entries, policy: .atEnd)
+                    completion(timeline)
+                } catch {
+                    print("Error getting weather: \(error)")
+                    let currentDate = Date()
+                    let timeline = Timeline(entries: [SimpleEntry(date: currentDate, location: "", temp: "")], policy: .after(currentDate.addingTimeInterval(5 * 60)))
+                    completion(timeline)
+                }
+            }
         })
     }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let latitude: String
-    let longitude: String
+    let location: String
+    let temp: String
 }
 
 struct WeatherDemo_WidgetEntryView : View {
@@ -54,9 +70,13 @@ struct WeatherDemo_WidgetEntryView : View {
     var body: some View {
         VStack {
             Text(entry.date, style: .time)
-            Text(entry.latitude)
-            Text(entry.longitude)
+            Spacer()
+            Text(entry.location)
+            Text(entry.temp + "°")
+                .font(.system(size: 50))
+                .fontWeight(.bold)
         }
+        .padding()
     }
 }
 
@@ -75,7 +95,7 @@ struct WeatherDemo_Widget: Widget {
 
 struct WeatherDemo_Widget_Previews: PreviewProvider {
     static var previews: some View {
-        WeatherDemo_WidgetEntryView(entry: SimpleEntry(date: Date(), latitude: "", longitude: ""))
+        WeatherDemo_WidgetEntryView(entry: SimpleEntry(date: Date(), location: "Huai'an", temp: "20"))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }

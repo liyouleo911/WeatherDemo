@@ -11,18 +11,26 @@ import CoreLocation
 class WidgetLocationManager: NSObject, CLLocationManagerDelegate {
     var locationManager: CLLocationManager? {
         didSet {
-            self.locationManager!.delegate = self
+            guard let locationManager = locationManager else {
+                return
+            }
+            locationManager.delegate = self
         }
     }
-    private var handler: ((CLLocation) -> Void)?
-    func fetchLocation(handler: @escaping (CLLocation) -> Void) {
+    private var handler: ((CLLocation?) -> Void)?
+    func fetchLocation(handler: @escaping (CLLocation?) -> Void) {
         self.handler = handler
-        self.locationManager!.requestLocation()
+        locationManager?.requestLocation()
     }
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.handler!(locations.last!)
+        guard let location = locations.last else {
+            handler?(nil)
+            return
+        }
+        handler?(location)
     }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error)
+        handler?(nil)
     }
 }
